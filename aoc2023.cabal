@@ -78,10 +78,11 @@ executable aoc2023
     import:           warnings
 
     -- .hs or .lhs file containing the Main module.
-    main-is:          day01.hs
+    main-is:          main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
+    other-modules:    Day1
+                      Day2
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

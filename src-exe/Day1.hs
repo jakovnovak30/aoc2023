@@ -1,6 +1,5 @@
-module Main where
+module Day1 where
 
-import qualified Util
 import Data.Char (isNumber)
 import Data.List (isPrefixOf)
 
@@ -34,10 +33,3 @@ convertNumber str
     | "eight" `isPrefixOf` str = "8"
     | "nine" `isPrefixOf` str = "9"
     | otherwise = str
-
-main :: IO ()
-main = do
-    x <- Util.getExample
-    print $ solution x
-    y <- Util.getTest
-    print $ solution y
