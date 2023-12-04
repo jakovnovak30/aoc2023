@@ -1,9 +1,9 @@
 module Main where
 
 import qualified Util
-import Day2
+import Day4
 
 main :: IO ()
 main = do
-    x <- Util.getExample
-    print $ solution x
+    x <- Util.getTest
+    print $ solution2 x
