@@ -61,10 +61,9 @@ inline bool in_bounds(int x, int y) {
   return y < matrix.size() && y >= 0 && x < matrix[0].size() && x >= 0;
 }
 
-int dfs(int x, int y, int counter, Direction last_dir, int area) {
+int dfs(int x, int y, int counter, Direction last_dir) {
   if(matrix[y][x] == 'S' && last_dir != NONE) {
     std::cout << "result: " << counter << std::endl;
-    std::cout << "area: " << (abs(area) - counter) / 2 + 1 << std::endl;
     return counter / 2;
   }
 
@@ -72,27 +71,40 @@ int dfs(int x, int y, int counter, Direction last_dir, int area) {
 
   // gore
   if(in_bounds(x, y - 1) && valid_move(matrix[y][x], matrix[y-1][x], UP) && !opposite_direction(last_dir, UP)) {
-    if(dfs(x, y-1, counter+1, UP, area + y * x - (y-1) * x))
+    if(dfs(x, y-1, counter+1, UP))
       return counter/2;
   }
   // dole
   if(in_bounds(x, y + 1) && valid_move(matrix[y][x], matrix[y+1][x], DOWN) && !opposite_direction(last_dir, DOWN)) {
-    if(dfs(x, y+1, counter+1, DOWN, area + y * x - (y+1) * x))
+    if(dfs(x, y+1, counter+1, DOWN))
       return counter/2;
   }
   // levo
   if(in_bounds(x - 1, y) && valid_move(matrix[y][x], matrix[y][x-1], LEFT) && !opposite_direction(last_dir, LEFT)) {
-    if(dfs(x-1, y, counter+1, LEFT, area + y * (x-1) - y * x))
+    if(dfs(x-1, y, counter+1, LEFT))
       return counter/2;
   }
   // desno
   if(in_bounds(x + 1, y) && valid_move(matrix[y][x], matrix[y][x+1], RIGHT) && !opposite_direction(last_dir, RIGHT)) {
-    if(dfs(x+1, y, counter+1, RIGHT, area + y * (x+1) - y * x))
+    if(dfs(x+1, y, counter+1, RIGHT))
       return counter/2;
   }
 
   path.erase(path.find(std::make_pair(x, y)));
   return 0;
+}
+
+bool is_inside(int y, int x) {
+  int count_intersect = 0;
+  // idi skroz do levog ruba i broji intersecte
+  for(int i=x;i >= 0;i--) {
+    if(path.find({i, y}) != path.end()) {
+      if(matrix[y][i] == '|' || matrix[y][i] == 'L' || matrix[y][i] == 'J')
+        count_intersect++;
+    }
+  }
+
+  return count_intersect % 2 == 1;
 }
 
 int main() {
@@ -125,7 +137,16 @@ int main() {
     visited.push_back(temp);
   }
 
-  dfs(start_x, start_y, 0, NONE, 0);
+  dfs(start_x, start_y, 0, NONE);
 
+  int count_inside = 0;
+  for(int i=0;i < matrix.size();i++) {
+    for(int j=0;j < matrix[i].size();j++) {
+      if(path.find({j, i}) == path.end())
+        count_inside += is_inside(i, j);
+    }
+  }
+
+  std::cout << "part2: " << count_inside << std::endl;
   return 0;
 }
