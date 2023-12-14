@@ -3,7 +3,11 @@
 #include <vector>
 #include <map>
 
+#define N_ITER 1000000000
+
 std::vector<std::string> matrix;
+std::map<std::vector<std::string>, int> memo;
+std::vector<std::vector<std::string>> indices;
 
 inline bool in_bounds(int x, int y) {
   return x >= 0 && x < matrix[0].size() && y >= 0 && y < matrix.size();
@@ -81,10 +85,26 @@ int main() {
   // }
 
   // part 2
-  for(int i=0;i < 1000;i++) {
-    cycle();
-  }
+  int cycle_start = 0;
+  int i;
+  for(i=0;i < N_ITER;i++) {
+    memo[matrix] = calculate_sum();
+    indices.push_back(matrix);
 
-  std::cout << "solution: " << calculate_sum() << std::endl;
+    cycle();
+    if(memo.find(matrix) != memo.end()) {
+      for(int k=0;k < indices.size();k++) {
+        if(indices[k] == matrix){
+          cycle_start = k;
+          break;
+        }
+      }
+      break;
+    }
+  }
+  int map_index = (N_ITER - i - 1) % (i - cycle_start + 1);
+  auto key = indices[cycle_start + map_index];
+
+  std::cout << "solution: " << memo[key] << std::endl;
   return 0;
 }
