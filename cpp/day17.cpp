@@ -1,11 +1,4 @@
-#include <cstdint>
-#include <ios>
-#include <iostream>
-#include <fstream>
-#include <iterator>
-#include <map>
-#include <queue>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -36,17 +29,17 @@ const bool operator<(const pair<int, State> first, const pair<int, State> second
   return first.first < second.first;
 }
 
-int distances[200][200][4][4]; // za svaku tocku, smjer i broj smjera
+int distances[200][200][4][10]; // za svaku tocku, smjer i broj smjera
 
-void dijkstra() {
+void dijkstra(int min_move, int max_move) {
   // initialize
   priority_queue<pair<int, State>, vector<pair<int, State>>, greater<pair<int, State>>> pq;
-  State start1 = { .x = 0, .y = 0, .last_dir = DOWN, .dir_count = 0 };
-  State start2 = { .x = 0, .y = 0, .last_dir = RIGHT, .dir_count = 0 };
+  State start1 = { .x = 0, .y = 0, .last_dir = DOWN, .dir_count = 1 };
+  State start2 = { .x = 0, .y = 0, .last_dir = RIGHT, .dir_count = 1 };
   pq.push(make_pair(0, start1));
   pq.push(make_pair(0, start2));
-  distances[0][0][3][0] = 0;
-  distances[0][0][1][0] = 0;
+  distances[0][0][3][1] = 0;
+  distances[0][0][1][1] = 0;
 
   while(!pq.empty()) {
     int dist = pq.top().first;
@@ -60,7 +53,9 @@ void dijkstra() {
         continue;
       if(is_opposite(closest.last_dir, (Direction) i))
         continue;
-      if(closest.last_dir == (Direction) i && closest.dir_count >= 3)
+      if(closest.last_dir == (Direction) i && closest.dir_count >= max_move)
+        continue;
+      if(closest.last_dir != (Direction) i && closest.dir_count < min_move)
         continue;
 
       State new_state;
@@ -73,6 +68,18 @@ void dijkstra() {
 
         distances[new_x][new_y][new_state.last_dir][new_state.dir_count] = dist + matrix[new_y][new_x];
         pq.push(make_pair(distances[new_x][new_y][new_state.last_dir][new_state.dir_count], new_state));
+      }
+    }
+  }
+}
+
+void reset_distance() {
+  for(int x=0;x < 200;x++) {
+    for(int y=0;y < 200;y++) {
+      for(int i=0;i < 4;i++) {
+        for(int j=0;j < 10;j++) {
+          distances[x][y][i][j] = INT32_MAX;
+        }
       }
     }
   }
@@ -97,18 +104,9 @@ int main() {
   file.close();
 
   // initialize distance arrays
-  for(int x=0;x < 200;x++) {
-    for(int y=0;y < 200;y++) {
-      for(int i=0;i < 4;i++) {
-        for(int j=0;j < 4;j++) {
-          distances[x][y][i][j] = INT32_MAX;
-        }
-      }
-    }
-  }
-  dijkstra();
-
+  reset_distance();
   // part 1
+  dijkstra(0, 3);
   int minimum = INT32_MAX;
   int x = matrix[0].size()-1, y = matrix.size()-1;
   for(int i=0;i < 4;i++) {
@@ -117,10 +115,18 @@ int main() {
         minimum = distances[x][y][i][j];
     }
   }
+  cout << "solution1: " << minimum << endl;
 
-  cout << "solution: " << minimum << endl;
-
-  // 1010 --> too high
-
+  // part 2
+  reset_distance();
+  dijkstra(4, 10);
+  minimum = INT32_MAX;
+  for(int i=0;i < 4;i++) {
+    for(int j=4;j < 11;j++) {
+      if(distances[x][y][i][j] < minimum)
+        minimum = distances[x][y][i][j];
+    }
+  }
+  cout << "solution2: " << minimum << endl;
   return 0;
 }
