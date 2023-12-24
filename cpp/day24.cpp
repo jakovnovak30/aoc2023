@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include <numeric>
+#include <ostream>
 #include <vector>
+#include <set>
 
 struct Line {
   long long x, y, z;
@@ -48,6 +51,13 @@ bool colliding(int i, int j) {
   return false;
 }
 
+bool check_velocity(int vel_x, int vel_y, int vel_z) {
+  std::set<int> visited; // set for "visited" times
+
+
+  return false;
+}
+
 int main() {
   std::fstream file("./input.txt");
 
@@ -62,15 +72,30 @@ int main() {
   file.close();
 
   // part 1
-  int counter = 0;
+  // int counter = 0;
+  // for(int i=0;i < lines.size();i++) {
+  //   for(int j=i + 1;j < lines.size();j++) {
+  //     if(colliding(i, j)) {
+  //       counter++;
+  //     }
+  //   }
+  // }
+  // std::cout << "solution1: " << counter << std::endl;
+
+  // part 2
+  // generate z3 input then solve using "z3 out.txt"
+  std::cout << "(declare-const x0 Int) (declare-const vx0 Int)" << std::endl
+       << "(declare-const y0 Int) (declare-const vy0 Int)" << std::endl
+       << "(declare-const z0 Int) (declare-const vz0 Int)" << std::endl;    
   for(int i=0;i < lines.size();i++) {
-    for(int j=i + 1;j < lines.size();j++) {
-      if(colliding(i, j)) {
-        counter++;
-      }
-    }
+    printf("(declare-const t%d Int)", i);
+
+    printf("(assert (= (* t%d (- vx0 %lld)) (- %lld x0)))\n", i, lines[i].vel_x, lines[i].x);
+    printf("(assert (= (* t%d (- vy0 %lld)) (- %lld y0)))\n", i, lines[i].vel_y, lines[i].y);
+    printf("(assert (= (* t%d (- vz0 %lld)) (- %lld z0)))\n", i, lines[i].vel_z, lines[i].z);
   }
-  std::cout << "solution1: " << counter << std::endl;
+  std::cout << "(check-sat) (get-model)" << std::endl;
+  std::cout << "(eval (+ x0 y0 z0))" << std::endl;
 
   return 0;
 }
